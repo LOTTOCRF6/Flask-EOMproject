@@ -27,7 +27,7 @@ def init_user_login_table():
                  "password TEXT NOT NULL),"
                  "address TEXT NOT NULL,"
                  "phone TEXT NOT NULL,"
-                 "email TEXT NOT NULL")
+                 "email TEXT NOT NULL)")
     print("user table created successfully")
     conn.close()
 

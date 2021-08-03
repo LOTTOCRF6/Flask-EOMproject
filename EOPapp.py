@@ -4,16 +4,15 @@ import sqlite3
 import datetime
 
 from flask import Flask, request, jsonify
-from flask_jwt import JWT, current_identity
+from flask_jwt import JWT, jwt_required, current_identity
 from flask_cors import CORS
+
 
 class User(object):
     def __init__(self, id, username, password):
         self.id = id
         self.username = username
         self.password = password
-
-
 
 
 def init_user_login_table():
@@ -24,24 +23,40 @@ def init_user_login_table():
                  "first_name TEXT NOT NULL,"
                  "last_name TEXT NOT NULL,"
                  "username TEXT NOT NULL,"
-                 "password TEXT NOT NULL),"
+                 "password TEXT NOT NULL,"
                  "address TEXT NOT NULL,"
                  "phone TEXT NOT NULL,"
-                 "email TEXT NOT NULL")
+                 "email TEXT NOT NULL)")
     print("user table created successfully")
     conn.close()
 
 
 init_user_login_table()
 
+
 def init_post_table():
     with sqlite3.connect('blog.db') as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS post (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                     "title TEXT NOT NULL,"
-                     "content TEXT NOT NULL,"
-                     "date_created TEXT NOT NULL)")
-    print("blog table created successfully.")
+        conn.execute("CREATE TABLE IF NOT EXISTS Login (id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "user_email TEXT NOT NULL,"
+                     "password TEXT NOT NULL,"
+                     "login_date TEXT NOT NULL)")
+    print("Login table created successfully.")
+
+
 init_post_table()
+#init_user_login_table()
+
+
+def product_table():
+    with sqlite3.connect('blog.db') as conn:
+        conn.execute("CREATE TABLE IF NOT EXISTS Products (id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "product_name TEXT NOT NULL,"
+                     "price TEXT NOT NULL,"
+                     "description TEXT NOT NULL, quantity TEXT NOT NULL)")
+    print("Products table created successfully.")
+
+
+product_table()
 
 
 def fetch_users():
@@ -53,7 +68,7 @@ def fetch_users():
         new_data = []
 
         for data in users:
-            new_data.append(User(data[0], data[3], data[4], data[5], data[6], data[7]))
+            new_data.append(User(data[0], data[3], data[4]))
     return new_data
 
 
@@ -82,15 +97,16 @@ app.config['SECRET_KEY'] = 'super-secret'
 
 jwt = JWT(app, authenticate, identity)
 
-@app.route('/protected')
 
+@app.route('/protected')
+@jwt_required()
 def protected():
     return '%s' % current_identity
+
 
 @app.route('/user-registration/', methods=["POST"])
 def user_registration():
     response = {}
-
     if request.method == "POST":
 
         first_name = request.form['first_name']
@@ -134,7 +150,7 @@ def create_blog():
                            "date_created) VALUES(?, ?, ?)", (title, content, date_created))
             conn.commit()
             response["status_code"] = 201
-            response['description'] = "Blog post added succesfully"
+            response['description'] = "Blog post added successfully"
         return response
 
 
@@ -153,7 +169,6 @@ def get_blogs():
 
 
 @app.route("/delete-post/<int:post_id>")
-
 def delete_post(post_id):
     response = {}
     with sqlite3.connect("blog.db") as conn:
@@ -166,7 +181,6 @@ def delete_post(post_id):
 
 
 @app.route('/edit-post/<int:post_id>/', methods=["PUT"])
-
 def edit_post(post_id):
     response = {}
 
