@@ -6,6 +6,7 @@ import datetime
 from flask import Flask, request, jsonify
 from flask_jwt import JWT, jwt_required, current_identity
 from flask_cors import CORS
+from flask_mail import Mail, Message
 
 
 class User(object):
@@ -97,6 +98,15 @@ app.config['SECRET_KEY'] = 'super-secret'
 
 jwt = JWT(app, authenticate, identity)
 
+app = Flask(__name__)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'sithandathuzipho@gmail.com'
+app.config['MAIL_PASSWORD'] = 'Crf6ZS@#'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
+
 
 @app.route('/protected')
 @jwt_required()
@@ -130,6 +140,10 @@ def user_registration():
             conn.commit()
             response["message"] = "success"
             response["status_code"] = 201
+
+            msg = Message('WELCOME', sender='sithandathuzipho@gmail.com', recipients=['sithandathuzipho@gmail.com'])
+            msg.body = "You have successfully registered"
+            mail.send(msg)
         return response
 
 
@@ -187,10 +201,12 @@ def get_Point_of_Sales():
     response['data'] = posts
     return response
 
+
 @app.route('/products/')
 def show_products():
     products = [{'id': 0, 'Product_name': 'Dead Line', 'Price': 450, 'Description': 'The best speed point'}, {'id': 1, 'Product_name': 'Yocco card machine', 'Description': 'Great card machine  '}]
     return jsonify(products)
+
 
 @app.route('/get-blogs/', methods=["GET"])
 def get_blogs():
