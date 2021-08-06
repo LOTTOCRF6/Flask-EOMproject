@@ -1,1 +1,1 @@
-web: gunicorn app:EOPapp
+web: gunicorn EOPapp:app
