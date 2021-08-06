@@ -207,7 +207,7 @@ def get_Point_of_Sales():
 
 @app.route('/products/')
 def show_products():
-    products = [{'id': 0, 'Product_name': 'Dead Line', 'Price': 450, 'Description': 'The best speed point'}, {'id': 1, 'Product_name': 'Yocco card machine', 'Description': 'Great card machine  '}]
+    products = [{'id': 1, 'Product_name': 'Dead Line', 'Price:' '5000,' 'Description': 'Great level of a usb'}]
     return jsonify(products)
 
 
