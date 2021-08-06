@@ -53,6 +53,7 @@ def init_product_table():
         conn.execute("CREATE TABLE IF NOT EXISTS Product_created (id INTEGER PRIMARY KEY AUTOINCREMENT,"
                      "product_name TEXT NOT NULL,"
                      "price TEXT NOT NULL,"
+                     "product_image TEXT NOT NULL,"
                      "description TEXT NOT NULL)")
     print("Products_created table created successfully.")
 
@@ -175,13 +176,15 @@ def create_product():
     if request.method == "POST":
         product_name = request.form['product_name']
         price = request.form['price']
+        product_image = request.form['product_image']
         description = request.form['description']
         with sqlite3.connect('blog.db') as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO Product_created("
                            "product_name,"
                            "price,"
-                           "description) VALUES(?, ?, ?)", (product_name, price, description))
+                           "product_image,"
+                           "description) VALUES(?, ?, ?, ?)", (product_name, price, product_image, description))
             conn.commit()
             response["status_code"] = 201
             response['description'] = "products created successfully"
