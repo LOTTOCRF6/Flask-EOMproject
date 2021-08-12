@@ -50,12 +50,12 @@ init_post_table()
 
 def init_product_table():
     with sqlite3.connect('blog.db') as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS Product_created (id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        conn.execute("CREATE TABLE IF NOT EXISTS Product_create (id INTEGER PRIMARY KEY AUTOINCREMENT,"
                      "product_name TEXT NOT NULL,"
                      "price TEXT NOT NULL,"
                      "product_image TEXT NOT NULL,"
                      "description TEXT NOT NULL)")
-    print("Products_created table created successfully.")
+    print("Products_create table created successfully.")
 
 
 init_product_table()
@@ -99,7 +99,7 @@ app.config['SECRET_KEY'] = 'super-secret'
 
 jwt = JWT(app, authenticate, identity)
 
-app = Flask(__name__)
+
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'sithandathuzipho@gmail.com'
@@ -180,7 +180,7 @@ def create_product():
         description = request.form['description']
         with sqlite3.connect('blog.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO Product_created("
+            cursor.execute("INSERT INTO Product_create("
                            "product_name,"
                            "price,"
                            "product_image,"
@@ -196,12 +196,15 @@ def get_Point_of_Sales():
     response = {}
     with sqlite3.connect("blog.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Product_created")
-
-        posts = cursor.fetchall()
+        cursor.row_factory = sqlite3.Row
+        cursor.execute("SELECT * FROM Product_create")
+        deals = cursor.fetchall()
+        deal_acc = []
+        for i in deals:
+            deal_acc.append({x: i[x] for x in i.keys()})
 
     response['status_code'] = 200
-    response['data'] = posts
+    response['data'] = tuple(deal_acc)
     return response
 
 
@@ -230,7 +233,7 @@ def delete_post(post_id):
     response = {}
     with sqlite3.connect("blog.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM Product_created WHERE id=" + str(post_id))
+        cursor.execute("DELETE FROM Product_create WHERE id=" + str(post_id))
         conn.commit()
         response['status_code'] = 200
         response['message'] = "products deleted successfully."
@@ -250,7 +253,7 @@ def edit_post(post_id):
                 put_data["product_name"] = incoming_data.get("product_name")
                 with sqlite3.connect('blog.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE Product_created SET product_name =? WHERE id=?", (put_data["product_name"], post_id))
+                    cursor.execute("UPDATE Product_create SET product_name =? WHERE id=?", (put_data["product_name"], post_id))
                     conn.commit()
                     response['message'] = "Update was successfully"
                     response['status_code'] = 200
@@ -259,7 +262,7 @@ def edit_post(post_id):
 
                 with sqlite3.connect('blog.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE Product_created SET price =? WHERE id=?", (put_data["price"], post_id))
+                    cursor.execute("UPDATE Product_create SET price =? WHERE id=?", (put_data["price"], post_id))
                     conn.commit()
 
                     response["price"] = "Price updated successfully"
@@ -269,7 +272,7 @@ def edit_post(post_id):
 
                 with sqlite3.connect('blog.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE Product_created SET description =? WHERE id=?", (put_data["description"], post_id))
+                    cursor.execute("UPDATE Product_create SET description =? WHERE id=?", (put_data["description"], post_id))
                     conn.commit()
 
                     response["description"] = "Description updated successfully"
