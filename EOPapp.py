@@ -5,7 +5,7 @@ import datetime
 
 from flask import Flask, request, jsonify
 from flask_jwt import JWT, jwt_required, current_identity
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask_mail import Mail, Message
 
 
@@ -111,11 +111,13 @@ jwt = JWT(app, authenticate, identity)
 
 @app.route('/protected')
 @jwt_required()
+@cross_origin()
 def protected():
     return '%s' % current_identity
 
 
 @app.route('/user-registration/', methods=["POST"])
+@cross_origin()
 def user_registration():
     response = {}
     if request.method == "POST":
@@ -149,6 +151,7 @@ def user_registration():
 
 
 @app.route('/create-blog/', methods=["POST"])
+@cross_origin()
 def create_blog():
     response = {}
 
@@ -170,6 +173,7 @@ def create_blog():
 
 
 @app.route('/create-products/', methods=["POST"])
+@cross_origin()
 def create_product():
     response = {}
 
@@ -192,6 +196,7 @@ def create_product():
 
 
 @app.route('/Get-Products/', methods=["GET"])
+@cross_origin()
 def get_Point_of_Sales():
     response = {}
     with sqlite3.connect("blog.db") as conn:
@@ -209,12 +214,14 @@ def get_Point_of_Sales():
 
 
 @app.route('/products/')
+@cross_origin()
 def show_products():
     products = [{'id': 1, 'Product_name': 'Dead Line', 'Price:' '5000,' 'Description': 'Great level of a usb'}]
     return jsonify(products)
 
 
 @app.route('/get-blogs/', methods=["GET"])
+@cross_origin()
 def get_blogs():
     response = {}
     with sqlite3.connect("blog.db") as conn:
@@ -229,6 +236,7 @@ def get_blogs():
 
 
 @app.route("/delete-products/<int:post_id>")
+@cross_origin()
 def delete_post(post_id):
     response = {}
     with sqlite3.connect("blog.db") as conn:
@@ -241,6 +249,7 @@ def delete_post(post_id):
 
 
 @app.route('/edit-post/<int:post_id>/', methods=["PUT"])
+@cross_origin()
 def edit_post(post_id):
     response = {}
 
@@ -281,6 +290,7 @@ def edit_post(post_id):
 
 
 @app.route('/get-post/<int:post_id>/', methods=["GET"])
+@cross_origin()
 def get_post(post_id):
     response = {}
 
